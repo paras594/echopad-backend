@@ -13,6 +13,12 @@ const io = new Server(server, {
   cors: {
     origin: process.env.ALLOWED_ORIGINS.split(", "),
     credentials: true,
+    handlePreflightRequest: (req, res) => {
+      res.writeHead(200, {
+        "Access-Control-Allow-Origin": process.env.ALLOWED_ORIGINS,
+        "Access-Control-Allow-Credentials": true,
+      });
+    },
   },
 });
 
@@ -82,4 +88,5 @@ app.use("/v1/api/auth", require("./routes/auth.routes"));
 const port = process.env.PORT || 5000;
 server.listen(port, () => {
   console.log("Server started on port ", port);
+  console.log("allowed origins", process.env.ALLOWED_ORIGINS.split(", "));
 });
