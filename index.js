@@ -31,6 +31,7 @@ io.on("connection", (socket) => {
   socket.on("register-user", async function (data) {
     console.log(data);
     socket.handshake.query.email = data.email;
+    socket.handshake.query.id = socket.id;
     socket.join(data.email);
     const sockets = await io.in(data.email).fetchSockets(); // returns an array of all sockets
     io.to(data.email).emit("user-joined-room", {
@@ -51,7 +52,12 @@ io.on("connection", (socket) => {
 
   socket.on("input-change", function (data) {
     console.log(data);
-    io.to(data.email).emit("input-change", data);
+    io.to(data.email)
+      .except(socket.id)
+      .emit("input-change", {
+        ...data,
+        sender: socket.id,
+      });
   });
 
   socket.on("disconnect", async function () {
@@ -59,7 +65,7 @@ io.on("connection", (socket) => {
     const socketEmail = socket.handshake.query.email;
     socket.leave(socketEmail);
     const sockets = await io.in(socketEmail).fetchSockets();
-    io.to(socketEmail).emit("user-left-room", {
+    io.to(socketEmail).except(socket.id).emit("user-left-room", {
       email: socketEmail,
       roomCount: sockets.length,
     });
@@ -74,6 +80,10 @@ app.use(
     credentials: true,
   })
 );
+
+app.get("/health", (req, res) => {
+  res.json({ success: true });
+});
 
 app.get("/", authenticateJWT, (req, res) => {
   // access cookie
