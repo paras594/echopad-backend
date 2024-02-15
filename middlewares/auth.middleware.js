@@ -2,10 +2,10 @@ const Users = require("../models/users.model");
 const jwtService = require("../services/jwt.service");
 
 const authenticateJWT = async (req, res, next) => {
-  console.log("authenticating", req.cookies.jwt);
+  console.log("authenticating", req.headers["authorization"]);
+  const [scheme, token] = req.headers["authorization"].split(" ");
   // check cookie
-  if (req.cookies.jwt) {
-    const token = req.cookies.jwt;
+  if (token) {
     const verify = jwtService.verify(token);
     console.log({ verify });
     const user = await Users.findOne({ _id: verify._id });

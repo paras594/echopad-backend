@@ -56,7 +56,7 @@ io.on("connection", (socket) => {
       .except(socket.id)
       .emit("input-change", {
         ...data,
-        sender: socket.id,
+        senderid: socket.id,
       });
   });
 

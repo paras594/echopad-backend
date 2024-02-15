@@ -23,14 +23,13 @@ const login = async (req, res) => {
   const user = await authService.login({ email, password });
   const jwt = jwtService.sign({ _id: user._id, email });
 
-  res.cookie("jwt", jwt, { httpOnly: true });
-
   res.json({
     success: true,
     message: "User logged in successfully",
     user: {
       name: user.name,
       email: user.email,
+      access_token: jwt,
     },
   });
 };
