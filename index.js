@@ -85,11 +85,17 @@ app.get("/health", (req, res) => {
   res.json({ success: true });
 });
 
-app.get("/", authenticateJWT, (req, res) => {
+app.get("/test-auth", authenticateJWT, (req, res) => {
   // access cookie
   console.log(req.cookies);
   res.json({
     message: "Hello World",
+  });
+});
+
+app.get("/", (req, res) => {
+  res.json({
+    message: "working ",
   });
 });
 
