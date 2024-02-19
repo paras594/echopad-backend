@@ -5,9 +5,12 @@ const http = require("http");
 const cookieParser = require("cookie-parser");
 const { Server } = require("socket.io");
 const { authenticateJWT } = require("./middlewares/auth.middleware");
+const compression = require("compression");
 
 const app = express();
 app.use(cookieParser({}));
+app.use(compression());
+
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
@@ -100,6 +103,11 @@ app.get("/", (req, res) => {
 });
 
 app.use("/v1/api/auth", require("./routes/auth.routes"));
+app.use(
+  "/v1/api/user-content",
+  authenticateJWT,
+  require("./routes/user-content.routes")
+);
 
 const port = process.env.PORT || 5000;
 server.listen(port, () => {
