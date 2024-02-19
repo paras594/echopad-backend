@@ -1,18 +1,24 @@
 const Users = require("../models/users.model");
 const bcrypt = require("bcryptjs");
+const CustomError = require("../utils/CustomError");
 
 class AuthService {
   async login({ email, password }) {
     const user = await Users.findOne({ email });
 
     if (!user) {
-      throw new Error("User not found");
+      return null;
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
 
     if (!isMatch) {
-      throw new Error("Incorrect password");
+      return new CustomError({
+        message: "Incorrect password",
+        errors: {
+          password: "Incorrect password",
+        },
+      });
     }
 
     return user;
