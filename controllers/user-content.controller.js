@@ -4,7 +4,6 @@ const updateUserContent = async (req, res) => {
   const { content } = req.body;
   const { _id } = req.user;
 
-  // TODO: Update user content
   try {
     const updatedContent = await userContentService.updateUserContent({
       content,
@@ -30,7 +29,6 @@ const getUserContent = async (req, res) => {
 
   console.log({ user: req.user });
 
-  // TODO: Get user content
   try {
     const userContent = await userContentService.getUserContent({
       userId: _id,

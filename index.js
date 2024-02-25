@@ -6,8 +6,12 @@ const cookieParser = require("cookie-parser");
 const { Server } = require("socket.io");
 const { authenticateJWT } = require("./middlewares/auth.middleware");
 const compression = require("compression");
+const cron = require("node-cron");
+const userFilesService = require("./services/user-files.service");
+const helmet = require("helmet");
 
 const app = express();
+app.use(helmet());
 app.use(cookieParser({}));
 app.use(compression());
 
@@ -75,6 +79,13 @@ io.on("connection", (socket) => {
   });
 });
 
+const every12Hours = "0 */12 * * *";
+const every10Secs = "*/10 * * * * *";
+
+cron.schedule(every12Hours, async () => {
+  await userFilesService.deleteExpiredUserFiles();
+});
+
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(
@@ -108,6 +119,18 @@ app.use(
   authenticateJWT,
   require("./routes/user-content.routes")
 );
+app.use("/v1/api/user-files", require("./routes/user-files.routes"));
+
+app.use((error, req, res, next) => {
+  if (error instanceof multer.MulterError) {
+    error.status = 413;
+    error.message = "image too large, max size is 1mb!";
+  }
+  const status = error.status || 500;
+  const message = error.message;
+  const response = { status: status, error: message };
+  res.status(status).json(response);
+});
 
 const port = process.env.PORT || 5000;
 server.listen(port, () => {
