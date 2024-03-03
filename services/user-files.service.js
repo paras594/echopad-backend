@@ -142,6 +142,10 @@ class UserFilesService {
       .limit(499)
       .lean();
 
+    if (!userFiles.length) {
+      return;
+    }
+
     console.log({ userFiles });
     const publicIds = userFiles.map((userFile) => userFile.publicId);
 
