@@ -6,17 +6,20 @@ const authenticateJWT = async (req, res, next) => {
   const [scheme, token] = req.headers["authorization"].split(" ");
   // check cookie
   if (token) {
-    const verify = jwtService.verify(token);
-    console.log({ verify });
-    const user = await Users.findOne({ _id: verify._id });
+    try {
+      const verify = jwtService.verify(token);
+      console.log({ verify });
+      const user = await Users.findOne({ _id: verify._id });
+      if (!user) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
 
-    if (!user) {
+      req.user = user;
+
+      next();
+    } catch (error) {
       return res.status(401).json({ message: "Unauthorized" });
     }
-
-    req.user = user;
-
-    next();
   } else {
     // Cookie does not exist
     return res.status(401).json({ message: "Unauthorized" });

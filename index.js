@@ -126,6 +126,7 @@ app.use((error, req, res, next) => {
     error.status = 413;
     error.message = "image too large, max size is 1mb!";
   }
+
   const status = error.status || 500;
   const message = error.message;
   const response = { status: status, error: message };
