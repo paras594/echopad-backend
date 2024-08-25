@@ -11,7 +11,7 @@ router.get("/", authenticateJWT, userFilesController.getUserFiles);
 router.post(
   "/upload",
   authenticateJWT,
-  fileUpload.single("file"),
+  fileUpload.array("files"),
   fileSizeLimitErrorMiddleware,
   userFilesController.uploadUserFile
 );

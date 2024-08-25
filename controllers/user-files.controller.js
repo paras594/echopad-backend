@@ -1,17 +1,16 @@
-const userContentService = require("../services/user-content.service");
 const userFilesService = require("../services/user-files.service");
 
 const uploadUserFile = async (req, res) => {
-  const { user, file, body } = req;
+  const { user, files } = req;
   try {
-    const userFile = await userFilesService.uploadUserFile({
-      content: file,
+    const userFiles = await userFilesService.uploadUserFile({
+      content: files,
       userId: user._id,
     });
 
     res.json({
       success: true,
-      userFile,
+      userFiles,
     });
   } catch (error) {
     console.log({ error });

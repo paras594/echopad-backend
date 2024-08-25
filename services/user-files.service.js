@@ -7,45 +7,50 @@ const {
 
 class UserFilesService {
   async uploadUserFile({ content, userId }) {
-    console.log({ content });
-    const dataUri = bufferToDataUri(content);
+    const result = [];
 
-    const resourceType = getCloudinaryResourceType(content.mimetype);
+    for (const file of content) {
+      const dataUri = bufferToDataUri(file);
 
-    let publicId;
+      const resourceType = getCloudinaryResourceType(file.mimetype);
 
-    const fileNameArr = content.originalname.split(".");
-    const extension = fileNameArr.pop();
-    const fileName = fileNameArr.join(".");
+      let publicId;
 
-    if (resourceType === "image" || resourceType === "video") {
-      publicId = `${fileName}-${Date.now()}`;
-    } else {
-      publicId = `${fileName}-${Date.now()}.${extension}`;
+      const fileNameArr = file.originalname.split(".");
+      const extension = fileNameArr.pop();
+      const fileName = fileNameArr.join(".");
+
+      if (resourceType === "image" || resourceType === "video") {
+        publicId = `${fileName}-${Date.now()}`;
+      } else {
+        publicId = `${fileName}-${Date.now()}.${extension}`;
+      }
+
+      const response = await cloudinary.uploader.upload(dataUri, {
+        folder: process.env.CLOUDINARY_FOLDER || "development",
+        public_id: publicId,
+        resource_type: resourceType,
+      });
+
+      const currentDate = new Date();
+      const expiry = currentDate.setHours(currentDate.getHours() + 12);
+
+      const newUserFile = new UserFiles({
+        fileUrl: response.secure_url,
+        fileName: file.originalname,
+        format: response.format || extension,
+        publicId: response.public_id,
+        resourceType: response.resource_type,
+        user: userId,
+        expireAt: expiry,
+      });
+
+      await newUserFile.save();
+
+      result.push(newUserFile);
     }
 
-    const response = await cloudinary.uploader.upload(dataUri, {
-      folder: process.env.CLOUDINARY_FOLDER || "development",
-      public_id: publicId,
-      resource_type: resourceType,
-    });
-
-    const currentDate = new Date();
-    const expiry = currentDate.setHours(currentDate.getHours() + 12);
-
-    const newUserFile = new UserFiles({
-      fileUrl: response.secure_url,
-      fileName: content.originalname,
-      format: response.format || extension,
-      publicId: response.public_id,
-      resourceType: response.resource_type,
-      user: userId,
-      expireAt: expiry,
-    });
-
-    await newUserFile.save();
-
-    return newUserFile;
+    return result;
 
     // console.log({ response });
     /*
