@@ -1,13 +1,10 @@
-const Users = require("../models/users.model");
-const bcrypt = require("bcryptjs");
-const CustomError = require("../utils/CustomError");
 const UserContent = require("../models/user-content.model");
 
 class UserContentService {
   async updateUserContent({ content, userId }) {
     const updatedContent = await UserContent.findOneAndUpdate(
-      { user: userId },
-      { content, user: userId },
+      { userId },
+      { content, userId },
       { new: true, upsert: true }
     );
 
@@ -15,7 +12,7 @@ class UserContentService {
   }
 
   async getUserContent({ userId }) {
-    const userContent = await UserContent.findOne({ user: userId });
+    const userContent = await UserContent.findOne({ userId });
 
     return userContent;
   }

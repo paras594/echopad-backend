@@ -41,7 +41,7 @@ class UserFilesService {
         format: response.format || extension,
         publicId: response.public_id,
         resourceType: response.resource_type,
-        user: userId,
+        userId,
         expireAt: expiry,
       });
 
@@ -108,8 +108,8 @@ class UserFilesService {
 
   async getUserFiles({ userId }) {
     const userFiles = await UserFiles.find({
-      user: userId,
-      expireAt: { $gt: Date.now() },
+      userId,
+      // expireAt: { $gt: Date.now() },
     }).sort({
       createdAt: -1,
     });
@@ -120,7 +120,7 @@ class UserFilesService {
   async deleteUserFile({ userId, fileId }) {
     const userFile = await UserFiles.findOne({
       _id: fileId,
-      user: userId,
+      userId,
     });
 
     if (!userFile) {
@@ -131,11 +131,9 @@ class UserFilesService {
       _id: userFile._id,
     });
 
-    const result = await cloudinary.uploader.destroy(userFile.publicId, {
+    await cloudinary.uploader.destroy(userFile.publicId, {
       resource_type: userFile.resourceType,
     });
-
-    console.log("RESULT -----", result);
 
     return true;
   }
@@ -151,7 +149,6 @@ class UserFilesService {
       return;
     }
 
-    console.log({ userFiles });
     const publicIds = userFiles.map((userFile) => userFile.publicId);
 
     const promises = userFiles.map((userFile) =>

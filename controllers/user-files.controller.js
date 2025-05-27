@@ -2,10 +2,11 @@ const userFilesService = require("../services/user-files.service");
 
 const uploadUserFile = async (req, res) => {
   const { user, files } = req;
+
   try {
     const userFiles = await userFilesService.uploadUserFile({
       content: files,
-      userId: user._id,
+      userId: user.uid,
     });
 
     res.json({
@@ -24,13 +25,11 @@ const uploadUserFile = async (req, res) => {
 };
 
 const getUserFiles = async (req, res) => {
-  const { _id } = req.user;
-
-  console.log({ user: req.user });
+  const { uid } = req.user;
 
   try {
     const userFiles = await userFilesService.getUserFiles({
-      userId: _id,
+      userId: uid,
     });
 
     res.json({
@@ -49,12 +48,12 @@ const getUserFiles = async (req, res) => {
 };
 
 const deleteUserFile = async (req, res) => {
-  const { _id } = req.user;
+  const { uid } = req.user;
   const { fileId } = req.params;
 
   try {
     const isDeleted = await userFilesService.deleteUserFile({
-      userId: _id,
+      userId: uid,
       fileId: fileId,
     });
 
