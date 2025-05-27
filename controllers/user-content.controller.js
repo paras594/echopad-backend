@@ -2,12 +2,12 @@ const userContentService = require("../services/user-content.service");
 
 const updateUserContent = async (req, res) => {
   const { content } = req.body;
-  const { _id } = req.user;
+  const { uid } = req.user;
 
   try {
-    const updatedContent = await userContentService.updateUserContent({
+    await userContentService.updateUserContent({
       content,
-      userId: _id,
+      userId: uid,
     });
 
     res.json({
@@ -25,13 +25,11 @@ const updateUserContent = async (req, res) => {
 };
 
 const getUserContent = async (req, res) => {
-  const { _id } = req.user;
-
-  console.log({ user: req.user });
+  const { uid } = req.user;
 
   try {
     const userContent = await userContentService.getUserContent({
-      userId: _id,
+      userId: uid,
     });
     res.json({
       success: true,

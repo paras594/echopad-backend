@@ -4,16 +4,23 @@ const mongoURI = process.env.MONGO_URI || "mongodb://localhost:27017/syncpad";
 mongoose.connect(mongoURI);
 
 mongoose.connection.on("connected", () =>
-  console.log("connected on:", mongoURI)
+  console.log(
+    "=> Connected on:",
+    mongoURI.includes("localhost") ? "localhost" : "cloud"
+  )
 );
 
-mongoose.connection.on("error", (err) => console.log("error:", err));
+mongoose.connection.on("error", (err) =>
+  console.log("xx = MongoDB error:", err)
+);
 
-mongoose.connection.on("disconnected", () => console.log("disconnected"));
+mongoose.connection.on("disconnected", () =>
+  console.log("=> MongoDB disconnected")
+);
 
 process.on("SIGINT", () => {
   mongoose.connection.close(() => {
-    console.log("app terminated, closing mongo connection");
+    console.log("=> App terminated, closing mongo connection");
     process.exit(0);
   });
 });

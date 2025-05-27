@@ -11,6 +11,10 @@ const userContentSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: "User",
     },
+    userId: {
+      type: String,
+      required: true,
+    },
   },
   {
     timestamps: true,

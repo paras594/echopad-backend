@@ -1,20 +1,24 @@
 const express = require("express");
 const router = express.Router();
 const userFilesController = require("../controllers/user-files.controller");
-const { authenticateJWT } = require("../middlewares/auth.middleware");
+const { authenticateToken } = require("../middlewares/auth.middleware");
 const { fileUpload } = require("../middlewares/file-upload.middleware");
 const {
   fileSizeLimitErrorMiddleware,
 } = require("../middlewares/file-size-limit-error.middleware");
 
-router.get("/", authenticateJWT, userFilesController.getUserFiles);
+router.get("/", authenticateToken, userFilesController.getUserFiles);
 router.post(
   "/upload",
-  authenticateJWT,
+  authenticateToken,
   fileUpload.array("files"),
   fileSizeLimitErrorMiddleware,
   userFilesController.uploadUserFile
 );
-router.delete("/:fileId", authenticateJWT, userFilesController.deleteUserFile);
+router.delete(
+  "/:fileId",
+  authenticateToken,
+  userFilesController.deleteUserFile
+);
 
 module.exports = router;

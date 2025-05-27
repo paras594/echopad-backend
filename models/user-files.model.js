@@ -21,6 +21,10 @@ const userFilesSchema = new Schema(
     resourceType: {
       type: String,
     },
+    userId: {
+      type: String,
+      required: true,
+    },
     user: {
       type: Schema.Types.ObjectId,
       ref: "User",
