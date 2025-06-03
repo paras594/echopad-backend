@@ -4,8 +4,8 @@ const memoryStorage = multer.memoryStorage();
 const fileFilter = (req, file, cb) => {
   const fileSize = parseInt(req.headers["content-length"]); // get the filesize
 
-  if (fileSize > process.env.MAX_FILE_SIZE)
-    cb(new Error("File size too large. Max file size is 10mb"), false);
+  if (fileSize > +process.env.MAX_FILE_SIZE)
+    cb(new Error("File size too large. Max file size is 10MB"), false);
   else cb(null, true); // no errors, then add the file
 };
 

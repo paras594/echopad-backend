@@ -1,3 +1,5 @@
+const fs = require("fs");
+const path = require("path");
 const { bufferToDataUri } = require("../utils/buffer-to-data-uri");
 const { cloudinary } = require("./cloudinary-storage.service");
 const UserFiles = require("../models/user-files.model");
@@ -107,9 +109,14 @@ class UserFilesService {
   }
 
   async getUserFiles({ userId }) {
+    const filter = {};
+    if (process.env.NODE_ENV !== "development") {
+      filter.expireAt = { $gt: Date.now() };
+    }
+
     const userFiles = await UserFiles.find({
       userId,
-      // expireAt: { $gt: Date.now() },
+      ...filter,
     }).sort({
       createdAt: -1,
     });
@@ -139,8 +146,13 @@ class UserFilesService {
   }
 
   async deleteExpiredUserFiles() {
+    const filters = {};
+    if (process.env.NODE_ENV !== "development") {
+      filters.expireAt = { $lt: Date.now() };
+    }
+
     const userFiles = await UserFiles.find({
-      // expireAt: { $lt: Date.now() },
+      ...filters,
     })
       .limit(499)
       .lean();

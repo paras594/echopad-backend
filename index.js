@@ -117,6 +117,7 @@ const every12Hours = "0 */12 * * *";
 const every10Secs = "*/10 * * * * *";
 
 cron.schedule(every12Hours, async () => {
+  if (process.env.NODE_ENV === "development") return;
   await userFilesService.deleteExpiredUserFiles();
 });
 
