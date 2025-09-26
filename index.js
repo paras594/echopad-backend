@@ -134,6 +134,10 @@ app.get("/health", (req, res) => {
   res.json({ success: true });
 });
 
+app.head("/health", (req, res) => {
+  res.json({ success: true });
+});
+
 app.get("/test-auth", authenticateJWT, (req, res) => {
   // access cookie
   console.log(req.cookies);
